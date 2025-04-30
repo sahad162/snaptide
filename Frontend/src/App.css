@@ -94,3 +94,89 @@
   .for-you-content, .following-content {
     min-height: 200px;
   }
+
+  .avatarimg{
+    border-radius: 50px;
+    background-color: aqua;
+    height: 50px;
+    width: 50px;
+    overflow: hidden;
+  }
+
+  .options {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 40px;
+    width: 40px;
+    border-radius: 50%;
+    transition: all 0.5s ease;
+  }
+  
+  .options:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: black;
+  }
+
+  .post-actions {
+    display: flex;
+    gap: 3px;
+    max-width: 425px;
+    margin-top: 4px;
+  }
+
+  .action-item {
+    display: flex;
+    align-items: center;
+  }
+  
+  .action-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-right: 4px;
+    margin-bottom: 10px;
+  }
+  
+  .action-button:hover {
+    background-color: rgba(256, 256, 256, 0.3);
+  }
+  
+  .comment-button:hover {
+    color: #1d9bf0;
+  }
+  
+  
+  .like-button:hover, .like-button.active {
+    color: #f91880;
+  }
+  
+  .like-button:hover {
+    background-color: rgba(256, 256, 256, 0.3);
+  }
+  
+  .share-button:hover {
+    color: #1d9bf0;
+  }
+  
+  .action-count {
+    color:rgba(256,256,256,0.8);
+    font-size: 15px;
+  }
+
+  .suggestimg{
+    border-radius: 50px;
+    background-color: aqua;
+    height: 30px;
+    width: 30px;
+    overflow: hidden;
+  }
+
+  .feeds::-webkit-scrollbar{
+    display: none;
+  }
