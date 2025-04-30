@@ -4,6 +4,7 @@ import { Modal, Button, FloatingLabel, Form } from "react-bootstrap";
 import DateOfBirthSelect from "./DateOfBirthSelect";
 import { userRegistration } from "../services/allAPI";
 import { useNavigate } from "react-router-dom";
+import { Userlogin } from "../services/allAPI";
 
 const CustomAuthModal = ({ show, handleClose, isloginpage, logosnap, title }) => {
   const navigate = useNavigate();
@@ -32,7 +33,6 @@ const CustomAuthModal = ({ show, handleClose, isloginpage, logosnap, title }) =>
     if (!email || !password || (!isloginpage && (!userName || !dob))) {
       return "Please fill in all required fields.";
     }
-    // Add more advanced validation here if needed
     return null;
   };
 
@@ -44,9 +44,22 @@ const CustomAuthModal = ({ show, handleClose, isloginpage, logosnap, title }) =>
 
     try {
       setLoading(true);
-
       if (isloginpage) {
-        console.log("Logging in with", userdata);
+        const payload={
+          email:userdata.email,
+          password:userdata.password
+        }
+        const response=await Userlogin(payload)
+        if(response?.status==200){
+          const token=response.data.access_token;
+          localStorage.setItem("token",token);
+          handleClose()
+          navigate('/feeds');
+        }
+        else{
+          setError(response.data?.error || "Login failed. Please try again.");
+        }
+
       } else {
         const response = await userRegistration(userdata);
         if (response?.status === 201) {

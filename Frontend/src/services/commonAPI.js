@@ -1,20 +1,25 @@
 import axios from 'axios';
 import baseURL from './BaseURL';
-const commonAPI=async (httpMethod,endPoint,requestBody)=>{
 
-    const payload={
-        method:httpMethod,
-        url:baseURL+endPoint,
-        data:requestBody
-    }
+const commonAPI = async (httpMethod, endPoint, requestBody) => {
+  // Get token from localStorage
+  const token = localStorage.getItem("token");
 
-    return await axios(payload)
-    .then((res)=>{
-        return res;
-    })
-    .catch((err)=>{
-        return err;
-    })
-}
+  const payload = {
+    method: httpMethod,
+    url: baseURL + endPoint,
+    data: requestBody,
+    headers: {
+      authorization: token && `Bearer ${token}` 
+    },
+  };
+
+  try {
+    const res = await axios(payload);
+    return res;
+  } catch (err) {
+    return err.response || { error: "Unknown error" };
+  }
+};
 
 export default commonAPI;
