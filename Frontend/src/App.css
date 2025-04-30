@@ -22,3 +22,75 @@
 .custom-modal-padding {
     border-radius: '15px';
   }
+
+/* Navigation list styles */
+.nav-list {
+    padding: 0;
+  }
+  
+  .list-style {
+    list-style: none;
+    font-size: 20px;
+    line-height: 60px;
+    color: #fff;
+    padding: 0 10px;
+    margin: 5px 0;
+    border-radius: 30px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .list-style:hover {
+    background-color:rgba(265, 265 ,265, 0.2);
+    cursor: pointer;
+  }
+  
+  /* Make the link take up the full width of the list item */
+  .list-style a {
+    display: block;
+    width: 100%;
+  }
+
+  .container {
+    width: 100%;
+    margin: 0 auto;
+  }
+  
+  .tab-container {
+    display: flex;
+    border-bottom: 1px solid #ddd;
+    border-left: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+    margin-bottom: 20px;
+  }
+  
+  .tab-btn {
+    flex: 1;
+    text-align: center;
+    padding: 15px 0;
+    font-weight: 500;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.3s ease;
+  }
+  
+  .tab-btn.active {
+    color: #fff;
+  }
+  
+  .tab-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 28%;
+    width: 50%;
+    height: 3px;
+    background-color: #fff;
+  }
+  
+  .tab-content {
+    padding: 20px 0;
+  }
+  
+  .for-you-content, .following-content {
+    min-height: 200px;
+  }
