@@ -1,8 +1,15 @@
-import React from 'react'
+import React, { useState } from 'react'
 import icon from '../assets/logosnap.png'
 import { Link } from 'react-router-dom'
+import Addposts from './Addposts';
 
 function Sidenav() {
+  const [show,setShow]=useState(false);
+
+  const btnclick=()=>{
+    setShow(true);
+  }
+
   return (
     <div className='d-flex justify-content-center align-items-center mt-1'>
       <ul className='mt-5 ms-5 nav-list'>
@@ -44,6 +51,15 @@ function Sidenav() {
           </Link>
         </li>
         <li className='list-style'>
+          <Link style={{textDecoration:'none',color:'#fff'}} onClick={btnclick} >
+            <span className='d-flex align-items-center gap-3'>
+              <i className="fa-solid fa-plus"></i>
+              <span className='fw-semibold'>Create</span>
+            </span>
+          </Link>
+        </li>
+        
+        <li className='list-style'>
           <Link style={{textDecoration:'none',color:'#fff'}}>
             <span className='d-flex align-items-center gap-3'>
               <i className="fa-solid fa-user"></i>
@@ -51,9 +67,10 @@ function Sidenav() {
             </span>
           </Link>
         </li>
+        < Addposts show={show} setShow={setShow} />
       </ul>
     </div>
   )
 }
 
-export default Sidenav
+export default Sidenav;
