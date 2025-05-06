@@ -6,11 +6,18 @@ import { userRegistration } from "../services/allAPI";
 import { useNavigate } from "react-router-dom";
 import { Userlogin } from "../services/allAPI";
 
-const CustomAuthModal = ({ show, handleClose, isloginpage, logosnap, title }) => {
+const CustomAuthModal = ({
+  show,
+  handleClose,
+  isloginpage,
+  logosnap,
+  title,
+}) => {
   const navigate = useNavigate();
 
   const [userdata, setUserdata] = useState({
     userName: "",
+    name:"",
     email: "",
     password: "",
     dob: "",
@@ -29,8 +36,8 @@ const CustomAuthModal = ({ show, handleClose, isloginpage, logosnap, title }) =>
   };
 
   const validateInputs = () => {
-    const { userName, email, password, dob } = userdata;
-    if (!email || !password || (!isloginpage && (!userName || !dob))) {
+    const { userName, email, password, dob, name } = userdata;
+    if (!email || !password || (!isloginpage && (!userName || !dob ||!name))) {
       return "Please fill in all required fields.";
     }
     return null;
@@ -45,33 +52,32 @@ const CustomAuthModal = ({ show, handleClose, isloginpage, logosnap, title }) =>
     try {
       setLoading(true);
       if (isloginpage) {
-        const payload={
-          email:userdata.email,
-          password:userdata.password
-        }
-        const response=await Userlogin(payload)
-        if(response?.status==200){
-          const token=response.data.access_token;
-          localStorage.setItem("token",token);
-          handleClose()
-          navigate('/feeds');
-        }
-        else{
+        const payload = {
+          email: userdata.email,
+          password: userdata.password,
+        };
+        const response = await Userlogin(payload);
+        if (response?.status == 200) {
+          const token = response.data.access_token;
+          localStorage.setItem("token", token);
+          handleClose();
+          navigate("/feeds");
+        } else {
           setError(response.data?.error || "Login failed. Please try again.");
         }
-
       } else {
         const response = await userRegistration(userdata);
         if (response?.status === 201) {
           setUserdata({
             userName: "",
+            name:"",
             email: "",
             password: "",
             dob: "",
           });
           handleClose();
         } else {
-          console.log()
+          console.log();
           setError(response.response.data.error);
         }
       }
@@ -84,8 +90,17 @@ const CustomAuthModal = ({ show, handleClose, isloginpage, logosnap, title }) =>
   };
 
   return (
-    <Modal show={show} onHide={handleClose} backdrop="static" centered size="md">
-      <Modal.Body className="p-4" style={{ background: "#157EC6", position: "relative" }}>
+    <Modal
+      show={show}
+      onHide={handleClose}
+      backdrop="static"
+      centered
+      size="md"
+    >
+      <Modal.Body
+        className="p-4"
+        style={{ background: "#157EC6", position: "relative" }}
+      >
         <button
           type="button"
           className="close text-white"
@@ -113,7 +128,11 @@ const CustomAuthModal = ({ show, handleClose, isloginpage, logosnap, title }) =>
         </div>
 
         <Form onSubmit={handleSubmit}>
-          <FloatingLabel controlId="floatingEmail" label="Email address" className="mb-3">
+          <FloatingLabel
+            controlId="floatingEmail"
+            label="Email address"
+            className="mb-3"
+          >
             <Form.Control
               type="email"
               name="email"
@@ -125,19 +144,44 @@ const CustomAuthModal = ({ show, handleClose, isloginpage, logosnap, title }) =>
           </FloatingLabel>
 
           {!isloginpage && (
-            <FloatingLabel controlId="floatingUsername" label="Username" className="mb-3">
-              <Form.Control
-                type="text"
-                name="userName"
-                placeholder="Username"
-                value={userdata.userName}
-                onChange={handleChange}
-                required
-              />
-            </FloatingLabel>
+            <>
+              <FloatingLabel
+                controlId="floatingName"
+                label="Name"
+                className="mb-3"
+              >
+                <Form.Control
+                  type="text"
+                  name="name"
+                  placeholder="Name"
+                  value={userdata.name}
+                  onChange={handleChange}
+                  required
+                />
+              </FloatingLabel>
+
+              <FloatingLabel
+                controlId="floatingUsername"
+                label="Username"
+                className="mb-3"
+              >
+                <Form.Control
+                  type="text"
+                  name="userName"
+                  placeholder="Username"
+                  value={userdata.userName}
+                  onChange={handleChange}
+                  required
+                />
+              </FloatingLabel>
+            </>
           )}
 
-          <FloatingLabel controlId="floatingPassword" label="Password" className="mb-3">
+          <FloatingLabel
+            controlId="floatingPassword"
+            label="Password"
+            className="mb-3"
+          >
             <Form.Control
               type="password"
               name="password"
@@ -166,14 +210,20 @@ const CustomAuthModal = ({ show, handleClose, isloginpage, logosnap, title }) =>
 
           {isloginpage && (
             <div className="d-flex justify-content-center mt-3">
-              <Button variant="link" className="text-white p-0" style={{ fontSize: "0.9rem" }}>
+              <Button
+                variant="link"
+                className="text-white p-0"
+                style={{ fontSize: "0.9rem" }}
+              >
                 Forgot Password?
               </Button>
             </div>
           )}
 
           <div className="text-center text-light mt-3">
-            {isloginpage ? "Don't have an account?" : "Already have an account?"}{" "}
+            {isloginpage
+              ? "Don't have an account?"
+              : "Already have an account?"}{" "}
             <span style={{ textDecoration: "underline", cursor: "pointer" }}>
               {isloginpage ? "Sign Up" : "Sign In"}
             </span>

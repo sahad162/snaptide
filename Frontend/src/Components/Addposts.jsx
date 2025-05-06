@@ -2,29 +2,34 @@ import React, { useEffect, useRef, useState } from "react";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import { Carousel } from "react-bootstrap";
+import { addPost } from "../services/allAPI";
 
 function Addposts({ show, setShow }) {
   const handleClose = () => setShow(false);
 
-  // State to store the post details including media, content, tags, and visibility
   const [postdetails, setpostdetails] = useState({
     postMedia: [],
-    postContent: '',
-    userTag: [],
-    visibility: 'public'
+    postContent: "",
+    userTag: "",
+    visibility: "public"
   });
 
   const [preview, setpreview] = useState([]);
-  const fileInputRef = useRef(null); // create useref
+  const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
 
-  // Handle the file input button click
+
+//to enhance button
+  const fileInputRef = useRef(null);
+
   const handleButtonClick = () => {
     fileInputRef.current.click();
   };
 
-  // Update the preview whenever files are changed
+
+  //preview image
   useEffect(() => {
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'video/mp4'];
+    const allowedTypes = ["image/jpeg", "image/png", "image/jpg", "video/mp4"];
     const validPreviews = [];
 
     postdetails.postMedia.forEach((file) => {
@@ -32,27 +37,24 @@ function Addposts({ show, setShow }) {
         const url = URL.createObjectURL(file);
         validPreviews.push(url);
       } else {
-        console.warn('Unsupported file type:', file.type);
+        console.warn("Unsupported file type:", file.type);
       }
     });
 
-    if (validPreviews.length > 0) {
-      setpreview(validPreviews);
-    }
+    setpreview(validPreviews);
 
-    // Cleanup function to revoke object URLs
     return () => {
-      validPreviews.forEach(url => URL.revokeObjectURL(url));
+      validPreviews.forEach((url) => URL.revokeObjectURL(url));
     };
   }, [postdetails.postMedia]);
 
-  // Handle file selection and updating the state
+  //getting input files
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
     setpostdetails({ ...postdetails, postMedia: files });
   };
 
-  // Handle input changes for post content, user tags, and visibility
+//getting content
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setpostdetails((prevDetails) => ({
@@ -61,92 +63,114 @@ function Addposts({ show, setShow }) {
     }));
   };
 
-  // Handle form submission
-  const handleSubmit = () => {
-    // Here you can add logic to submit the form data
-    console.log("Post Submitted:", postdetails);
-    handleClose(); // Close the modal after submission
+
+//submiting the add post
+  const handleSubmit = async () => {
+    setErrorMsg("");
+    console.log("handle submit");
+    
+
+    if (
+      !postdetails.postContent.trim() ||
+      postdetails.postMedia.length === 0
+    ) {
+      setErrorMsg("Please fill in all required fields and upload at least one file.");
+      return;
+    }
+    
+    const formdata = new FormData();
+    postdetails.postMedia.forEach((file) => {
+      formdata.append("postMedia", file);
+    });
+    formdata.append("postContent", postdetails.postContent);
+    formdata.append("userTag", JSON.stringify(postdetails.userTag.split(",").map(tag => tag.trim())));
+    formdata.append("visibility", postdetails.visibility);
+
+    
+
+    if (localStorage.getItem("token")) {
+      const requestHeader = {
+        authorization: `Bearer ${localStorage.getItem("token")}`
+      };
+
+      setLoading(true);
+      try {
+        const response = await addPost(formdata, requestHeader);
+        if (response.status === 200) {
+          handleClose();
+          setpostdetails({
+            postMedia: [],
+            postContent: "",
+            userTag: "",
+            visibility: "public"
+          });
+          setpreview([]);
+        } else {
+          setErrorMsg("Issue while posting. Please try again.");
+        }
+      } catch (err) {
+        console.error(err);
+        setErrorMsg("Something went wrong during the upload.");
+      } finally {
+        setLoading(false);
+      }
+    }
+    else{
+      console.log("no token there");
+    }
   };
 
   return (
     <>
-      <Modal
-        show={show}
-        onHide={handleClose}
-        backdrop="static"
-        keyboard={false}
-      >
+      <Modal show={show} onHide={handleClose} backdrop="static" keyboard={false}>
         <Modal.Body>
-          <div className="text-center">
+          <div className="text-center mb-3">
             <span className="fw-semibold">Create new post</span>
             <hr />
           </div>
 
-          {/* If there are previews, show them */}
           {preview.length > 0 ? (
-            <div className="text-center ">
-              <Carousel>
-                {preview.map((url, index) => (
-                  <Carousel.Item key={index}>
-                    {url.includes('video') ? (
-                      <video
-                        src={url}
-                        width="100%"
-                        controls
-                        style={{ maxHeight: '500px' }}
-                      />
-                    ) : (
-                      <img
-                        src={url}
-                        alt={`Preview ${index}`}
-                        className="d-block w-100"
-                        style={{ maxHeight: '500px', objectFit: 'contain' }}
-                      />
-                    )}
-                  </Carousel.Item>
-                ))}
-              </Carousel>
-
-              <button
-                onClick={handleButtonClick}
-                className="mt-4 btn btn-primary"
-              >
-                Upload File
-              </button>
-              <input
-                type="file"
-                ref={fileInputRef}
-                onChange={handleFileChange}
-                style={{ display: "none" }}
-                multiple
-              />
-            </div>
+            <Carousel>
+              {preview.map((url, index) => (
+                <Carousel.Item key={index}>
+                  {url.includes("video") ? (
+                    <video
+                      src={url}
+                      width="100%"
+                      controls
+                      style={{ maxHeight: "500px" }}
+                    />
+                  ) : (
+                    <img
+                      src={url}
+                      alt={`Preview ${index}`}
+                      className="d-block w-100"
+                      style={{ maxHeight: "500px", objectFit: "contain" }}
+                    />
+                  )}
+                </Carousel.Item>
+              ))}
+            </Carousel>
           ) : (
-           
             <div className="image text-center">
-              <i
-                className="fa-regular fa-image"
-                style={{ fontSize: "100px" }}
-              ></i>
-              <div className="fs-5">Upload photos here</div>
-              <button
-            onClick={handleButtonClick}
-            className="mt-4 btn btn-primary"
-          >
-            Upload File
-          </button>
-          <input
-            type="file"
-            ref={fileInputRef}
-            onChange={handleFileChange}
-            style={{ display: "none" }}
-            multiple
-          />
+              <i className="fa-regular fa-image" style={{ fontSize: "100px" }}></i>
+              <div className="fs-5">Upload photos or videos</div>
             </div>
-           
           )}
 
-          {/* Input fields for post content, tags, and visibility */}
+          <div className="text-center mt-3">
+            <button onClick={handleButtonClick} className="btn btn-primary">
+              Upload File
+            </button>
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              style={{ display: "none" }}
+              multiple
+            />
+          </div>
+
           <div className="mt-3">
             <textarea
               name="postContent"
@@ -181,14 +205,16 @@ function Addposts({ show, setShow }) {
               <option value="friends">Friends</option>
             </select>
           </div>
+
+          {errorMsg && <div className="text-danger mt-2">{errorMsg}</div>}
         </Modal.Body>
 
         <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>
+          <Button variant="secondary" onClick={handleClose} disabled={loading}>
             Close
           </Button>
-          <Button variant="primary" onClick={handleSubmit}>
-            Submit Post
+          <Button variant="primary" onClick={handleSubmit} disabled={loading}>
+            {loading ? "Posting..." : "Submit Post"}
           </Button>
         </Modal.Footer>
       </Modal>

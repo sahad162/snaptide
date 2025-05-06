@@ -23,3 +23,23 @@ exports.addPost = async (req, res) => {
     res.status(500).json({ err: "Internal server error while adding post" });
   }
 };
+
+
+
+
+exports.allPosts = async (req, res) => {
+  try {
+    const userId = req.user.id;    
+    const query = { 
+      visibility: 'public'  
+    };
+
+    const posts = await Post.find(query)
+      .sort({ datePosted: -1 }); 
+
+    res.status(200).json({ posts });
+  } catch (err) {
+    console.error('Error fetching posts:', err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};

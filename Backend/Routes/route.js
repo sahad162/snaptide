@@ -10,6 +10,10 @@ const router=new express.Router()
 
 router.post('/register',usercontroller.registerUser);
 router.post('/login',usercontroller.loginUser);
-router.post('/addpost',jwtmiddleware,multermiddle,postController.addPost)
+router.get('/getusers',jwtmiddleware,usercontroller.getusers);
+router.post('/togglefollow',jwtmiddleware,usercontroller.togglefollow)
+router.post('/addpost',jwtmiddleware,multermiddle,postController.addPost);
+router.get('/allposts',jwtmiddleware,postController.allPosts);
+
 
 module.exports=router;

@@ -1,17 +1,16 @@
 import axios from 'axios';
 import baseURL from './BaseURL';
 
-const commonAPI = async (httpMethod, endPoint, requestBody) => {
-  // Get token from localStorage
-  const token = localStorage.getItem("token");
-
+const commonAPI = async (httpMethod, endPoint, requestBody,reqHeader) => {
   const payload = {
     method: httpMethod,
     url: baseURL + endPoint,
     data: requestBody,
-    headers: {
-      authorization: token && `Bearer ${token}` 
-    },
+    headers: reqHeader
+      ? reqHeader
+      : {
+          "Content-Type": "application/json",
+        },
   };
 
   try {

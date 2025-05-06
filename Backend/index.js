@@ -9,6 +9,10 @@ app.use(cors())
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }));
 
+app.use('/uploads/images', express.static('./uploads/images'));
+
+app.use('/uploads/videos', express.static( './uploads/videos'));
+
 const router=require('./Routes/route')
 app.use(router)
 

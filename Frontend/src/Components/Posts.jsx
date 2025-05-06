@@ -1,9 +1,8 @@
 import React, { useState } from "react";
-import { Container, Row, Col } from "react-bootstrap";
-import logo from "../assets/snap.png";
+import { Container, Row, Col, Carousel } from "react-bootstrap";
+import baseURL from "../services/BaseURL";
 
-function Posts({ activeTab }) {
-  const [haveImage, setHaveImage] = useState(true);
+function Posts({ activeTab, post }) {
   const [isLiked, setIsLiked] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
   const [likeCount, setLikeCount] = useState(10);
@@ -19,20 +18,18 @@ function Posts({ activeTab }) {
 
   return (
     <Container
-    className="border rounded p-3 mb-4 text-dark"
-    style={{
-      backgroundColor: "rgba(255, 255, 255, 0.4)",  // White background with transparency
-      backdropFilter: "blur(10px)",  // Blur effect behind the container
-      border: "1px solid rgba(255, 255, 255, 0.2)",  // Subtle white border
-      boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",  // Soft shadow for depth
-    }}
-  >
-    
+      className="border rounded p-3 mb-4 text-dark"
+      style={{
+        backgroundColor: "rgba(255, 255, 255, 0.4)", // White background with transparency
+        backdropFilter: "blur(10px)", // Blur effect behind the container
+        border: "1px solid rgba(255, 255, 255, 0.2)", // Subtle white border
+        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)", // Soft shadow for depth
+      }}
+    >
       <Row>
         {/* Avatar */}
         <Col md={1}>
           <img
-            src={logo}
             alt="Avatar"
             className="img-fluid rounded-circle"
             style={{ maxWidth: "50px", maxHeight: "50px" }}
@@ -51,15 +48,14 @@ function Posts({ activeTab }) {
             <div className="d-flex align-items-center gap-2">
               {activeTab === "forYou" && (
                 <button
-                className={`btn btn-sm px-3 rounded-pill ${isFollow ? "btn-outline-dark" : "text-light"}`}
-                style={{
-                  backgroundColor: isFollow ? "transparent" : "#157EC6",
-                }}
-                onClick={handleFollow}
-              >
-                {isFollow ? "Following" : "+ Follow"}
-              </button>
-              
+                  className={`btn btn-sm px-3 rounded-pill ${isFollow ? "btn-outline-dark" : "text-light"}`}
+                  style={{
+                    backgroundColor: isFollow ? "transparent" : "#157EC6",
+                  }}
+                  onClick={handleFollow}
+                >
+                  {isFollow ? "Following" : "+ Follow"}
+                </button>
               )}
               <button className="btn text-light p-0">
                 <i className="fa-solid fa-ellipsis"></i>
@@ -69,20 +65,35 @@ function Posts({ activeTab }) {
 
           {/* Body Text */}
           <p className="mt-2" style={{ textAlign: "justify" }}>
-            Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-            Praesentium harum nisi quia totam deserunt, mollitia earum...
+            {post.postContent}
           </p>
 
-          {/* Optional Image */}
-          {haveImage && (
-            <div className="my-3">
-              <img
-                src={logo}
-                alt="Post visual"
-                className="img-fluid rounded border"
-                style={{ maxHeight: "300px", maxWidth: "100%" }}
-              />
-            </div>
+          {/* Carousel for Images and Videos */}
+          {post.postMedia && post.postMedia.length > 0 ? (
+            <Carousel>
+              {post.postMedia.map((media, index) => (
+                <Carousel.Item key={index}>
+                  {media.endsWith(".mp4") || media.endsWith(".webm") ? (
+                    <video controls style={{ width: "100%", maxHeight: "300px" }}>
+                      {console.log(media)}
+                      <source src={`${baseURL}uploads/videos/${media}`} type="video/mp4" />
+                      Your browser does not support the video tag.
+                    </video>
+                  ) : media.endsWith(".jpg") || media.endsWith(".jpeg") || media.endsWith(".png") ? (
+                    // Image media
+                    <img
+                      className="d-block w-100"
+                      src={`${baseURL}uploads/images/${media}`}
+                      alt={`Media ${index + 1}`}
+                      style={{ maxHeight: "300px", objectFit: "cover" }}
+                    />
+                  ) : null}
+                </Carousel.Item>
+              ))}
+            </Carousel>
+          ) : (
+            // If no media
+            <div>No media available</div>
           )}
 
           {/* Action Buttons */}
@@ -96,16 +107,10 @@ function Posts({ activeTab }) {
 
               {/* Like */}
               <div
-                className={`d-flex align-items-center gap-2 cursor-pointer ${
-                  isLiked ? "text-danger" : ""
-                }`}
+                className={`d-flex align-items-center gap-2 cursor-pointer ${isLiked ? "text-danger" : ""}`}
                 onClick={handleLike}
               >
-                <i
-                  className={`${
-                    isLiked ? "fa-solid" : "fa-regular"
-                  } fa-heart fs-5`}
-                ></i>
+                <i className={`${isLiked ? "fa-solid" : "fa-regular"} fa-heart fs-5`}></i>
                 <span>{likeCount}</span>
               </div>
 
@@ -117,11 +122,7 @@ function Posts({ activeTab }) {
 
             {/* Save */}
             <div onClick={handleSave} className="cursor-pointer">
-              <i
-                className={`${
-                  isSaved ? "fa-solid" : "fa-regular"
-                } fa-bookmark fs-5`}
-              ></i>
+              <i className={`${isSaved ? "fa-solid" : "fa-regular"} fa-bookmark fs-5`}></i>
             </div>
           </div>
         </Col>

@@ -1,8 +1,31 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Posts from './Posts';
+import { allposts } from '../services/allAPI';
 
 function Feeds() {
   const [activeTab, setActiveTab] = useState('forYou');
+  const [postdata,setpostdata]=useState([]);
+
+  const allpostfeed=async ()=>{
+    try{
+      let reqHeader={
+        "authorization":`Bearer ${localStorage.getItem('token')}`
+      }
+      let response=await allposts(reqHeader);
+      if(response.status==200){
+        setpostdata(response.data.posts)
+      }
+    }
+    catch(err){
+      console.log(err);
+    }
+  }
+
+  useEffect(()=>{
+    allpostfeed()
+  },[])
+
+
 
   return (
     <div
@@ -43,9 +66,13 @@ function Feeds() {
       <div className="tab-content " style={{marginTop:'-30px'}}>
         {activeTab === 'forYou' && (
           <div className="for-you-content">
-            <Posts activeTab={activeTab} />
-            <Posts activeTab={activeTab} />
-            <Posts activeTab={activeTab} /> 
+            {
+              postdata.length>0&&
+              postdata.map((post)=>(
+                <Posts activeTab={activeTab} post={post}/>
+              ))
+
+            }
 
           </div>
         )}
